@@ -1,17 +1,4 @@
 
-        global username
-        global password
-        self.text = ""
-        uic.loadUi('Speed_Test.ui', self) # Загружаем дизайн
-        self.stop_reading = True
-        self.seconds = 0
-        self.btn_OpenFile.clicked.connect(lambda: self.open_file())
-        self.btn_CopyClip.clicked.connect(lambda: self.copy_clipboard())
-        self.btn_Start.clicked.connect(lambda: self.start_test())
-        self.btn_Stop.clicked.connect(lambda: self.stop())
-        timer = QTimer(self)
-        timer.timeout.connect(lambda: self.show_time())
-        timer.start(100)
 
     def open_file(self):
         # открытие файла с текстом
@@ -46,15 +33,7 @@
         con = sqlite3.connect('')
         cur = con.cursor()
       
-        # записываем  результат
-        if self.wmRating != rating:
-            cur.execute("""UPDATE Stats
-                                SET wm_rating = ?
-                                    WHERE id = (
-                                    SELECT id FROM User
-                                    WHERE login = ?)""", (self.wmRating, username))
-        con.commit()
-        con.close()
+     
         # выводим результат пользователю
 
         buttonReply = QMessageBox.question(self, 'Результат',
@@ -71,94 +50,13 @@
 class SpeedLineWindow(QDialog):
     def __init__(self):
         super().__init__()
-        uic.loadUi('Speed_Line.ui', self)  # Загружаем дизайн
-        #####################################################################
-        self.stop_reading = True
-        self.seconds = 0
-        self.text = ""
-        self.WordArr = []
-        self.btn_OpenFile.clicked.connect(lambda: self.open_file())
-        self.btn_CopyClip.clicked.connect(lambda: self.copy_clipboard())
-        self.btn_Start.clicked.connect(lambda: self.start_reading())
-        timer = QTimer(self)
-        timer.timeout.connect(lambda: self.show_word())
-        timer.start(100)
-        if self.seconds == len(self.WordArr):
-            self.end_reading()
-
-    def open_file(self):
-        # открытие файла с текстом
-        fname = QFileDialog.getOpenFileName(self, 'Выбрать файл с текстом', '')[0]
-        text_file = open(fname, mode="r")
-        self.text = text_file.read()
-        self.textEdit_MainText.setText(self.text)
-        text_file.close()
-
-    def copy_clipboard(self):
-        # копирование текста из буфера обмена
-        clip = clipboard.paste()
-        self.textEdit_MainText.setText(clip)
-
-    def show_word(self):
-        if not self.stop_reading and self.seconds < len(self.WordArr) - 1:
-            self.seconds += 1
-            self.line_SpeedLine.setText(self.WordArr[self.seconds])
-
-    def end_reading(self):
-        self.stop_reading = True
-        con = sqlite3.connect('../../Documents/Programms/Проект Ершов Степан/Speed Reader/Users.db')
-        cur = con.cursor()
-        rating = cur.execute("""SELECT wm_rating FROM Stats 
-                            WHERE id=(
-                                SELECT id FROM User
-                                    WHERE Login = ?)""", (username,)).fetchall()
-        con.close()
-        # wmRating = int(rating[0])
-        # self.slider_speed.setTickPosition(wmRating)
-
-        self.close()
-        # self.Menu = MenuWindow()
-        # self.Menu.show()
-
-    def start_reading(self):
-        self.WordArr = self.text.split()
-        self.stop_reading = False
-        self.seconds = 0
-
-        # wmRating = int(rating[0])
-        # self.slider_speed.setTickPosition(wmRating)
-        # while i < len(WordArr):
-        #     timing = time.time()
-        #     ping = self.slider_speed.value()
-        #     print(ping)
-        #     if time.time() - timing > ping/10:
-        #         timing = time.time()
-        #         self.line_SpeedLine.setText(WordArr[i])
-        #         i += 1
-
-
-class RunningLineWindow(QDialog):
-    def __init__(self):
-        super().__init__()
-        global username
-        global password
-        uic.loadUi('Running_Words.ui', self)  # Загружаем дизайн
-        # установка скорости для пользователя
-        con = sqlite3.connect('')
-        cur = con.cursor()
-        rating = cur.execute("""SELECT wm_rating FROM Stats 
-                    WHERE id=(
-                        SELECT id FROM User
-                            WHERE Login = ?)""", (username,)).fetchall()
-        con.close()
-        self.points = 0
-        self.user_speed = rating
-        self.text_arr = []
-        self.random_word = ""
-        self.btn_Start.clicked.connect(lambda: self.run())
-        self.btn_ok.clicked.connect(lambda: self.check())
-        self.btn_openFile.clicked.connect(lambda: self.open_file())
-
+        uic.loadUi('Speed_Line.ui', self)  
+        # Загружаем дизайн
+       
+       
+       
+       
+       
     def open_file(self):
         # открытие файла с текстом
         fname = QFileDialog.getOpenFileName(self, 'Выбрать файл с текстом', '')[0]
@@ -167,93 +65,7 @@ class RunningLineWindow(QDialog):
         self.text_arr = self.text.split()
         text_file.close()
 
-    def run(self):
-        i = 0
-        line = 0
-        timing = time.time()
-        self.random_word = ""
-        # отображение случайных слов в полях по порядку
-        while i < random.randint(10, 30):
-            if time.time() - timing > 10:  #################self.user_speed[0]:
-                timing = time.time()
-                if line == 1:
-                    self.random_word = self.text_arr[random.randint(0, len(self.text_arr) - 1)]
-                    self.line1.setText(self.random_word)
-                    timing2 = time.time()
-                    if time.time() - timing2 > 10:  # self.user_speed:
-                        self.line1.setText("")
-                elif line == 2:
-                    self.random_word = self.text_arr[random.randint(0, len(self.text_arr) - 1)]
-                    self.line2.setText(self.random_word)
-                    timing2 = time.time()
-                    if time.time() - timing2 > 10:  # self.user_speed:
-                        self.line2.setText("")
-                elif line == 3:
-                    self.random_word = self.text_arr[random.randint(0, len(self.text_arr) - 1)]
-                    self.line3.setText(self.random_word)
-                    timing2 = time.time()
-                    if time.time() - timing2 > 10:  # self.user_speed:
-                        self.line3.setText("")
-                elif line == 4:
-                    self.random_word = self.text_arr[random.randint(0, len(self.text_arr) - 1)]
-                    self.line4.setText(self.random_word)
-                    timing2 = time.time()
-                    if time.time() - timing2 > 10:  # self.user_speed:
-                        self.line4.setText("")
-                elif line == 5:
-                    self.random_word = self.text_arr[random.randint(0, len(self.text_arr) - 1)]
-                    self.line5.setText(self.random_word)
-                    timing2 = time.time()
-                    if time.time() - timing2 > 10:  # self.user_speed:
-                        self.line5.setText("")
-                elif line == 6:
-                    self.random_word = self.text_arr[random.randint(0, len(self.text_arr) - 1)]
-                    self.line6.setText(self.random_word)
-                    timing2 = time.time()
-                    if time.time() - timing2 > 10:  # self.user_speed:
-                        self.line6.setText("")
-                elif line == 7:
-                    self.random_word = self.text_arr[random.randint(0, len(self.text_arr) - 1)]
-                    self.line7.setText(self.random_word)
-                    timing2 = time.time()
-                    if time.time() - timing2 > 10:  # self.user_speed:
-                        self.line7.setText("")
-                elif line == 8:
-                    self.random_word = self.text_arr[random.randint(0, len(self.text_arr) - 1)]
-                    self.line8.setText(self.random_word)
-                    timing2 = time.time()
-                    if time.time() - timing2 > 10:  # self.user_speed:
-                        self.line8.setText("")
-                elif line == 9:
-                    self.random_word = self.text_arr[random.randint(0, len(self.text_arr) - 1)]
-                    self.line9.setText(self.random_word)
-                    timing2 = time.time()
-                    if time.time() - timing2 > 10:  # self.user_speed:
-                        self.line9.setText("")
-                line += 1
-                i += 1
-
-    def check(self):
-
-        answer = self.line_Answer.text()
-        if self.points < 10:
-            # пока пользователь не набрал 10 правильных ответов упражнение продолжается
-            if self.random_word == answer:
-                self.label_alert.setText("Верно")
-                self.points += 1
-                self.run()
-            else:
-                self.label_alert.setText("Не верно")
-                self.run()
-        else:
-            # запись результатов
-            con = sqlite3.connect('../../Documents/Programms/Проект Ершов Степан/Speed Reader/Users.db')
-            cur = con.cursor()
-            # находим старый результат по имени пользователя
-            rating = cur.execute("""SELECT Score FROM Stats 
-                            WHERE id=(
-                                SELECT id FROM User
-                                    WHERE Login = ?)""", (username,)).fetchall()
+   
             # записываем новый результат
             if self.points != rating[0]:
                 cur.execute("""INSERT INTO Stats (score) VALUES (?)
